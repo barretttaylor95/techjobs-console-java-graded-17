@@ -14,10 +14,8 @@ import java.util.List;
  * Created by LaunchCode
  */
 public class JobData {
-
     private static final String DATA_FILE = "src/main/resources/job_data.csv";
     private static boolean isDataLoaded = false;
-
     private static ArrayList<HashMap<String, String>> allJobs;
 
     /**
@@ -28,20 +26,16 @@ public class JobData {
      * @return List of all of the values of the given field
      */
     public static ArrayList<String> findAll(String field) {
-
         // load data, if not already loaded
         loadData();
 
         ArrayList<String> values = new ArrayList<>();
-
         for (HashMap<String, String> row : allJobs) {
             String aValue = row.get(field);
-
             if (!values.contains(aValue)) {
                 values.add(aValue);
             }
         }
-
         return values;
     }
 
@@ -52,7 +46,6 @@ public class JobData {
 
         return allJobs;
     }
-
     /**
      * Returns results of search the jobs data by key/value, using
      * inclusion of the search term.
@@ -68,21 +61,16 @@ public class JobData {
 
         // load data, if not already loaded
         loadData();
-
         ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
-
         for (HashMap<String, String> row : allJobs) {
-
             String aValue = row.get(column);
-
-            if (aValue.contains(value)) {
+            //gotta make sure nobody tAlKs LiKe tHiS
+            if (aValue != null && aValue.toLowerCase().contains(value.toLowerCase())) {
                 jobs.add(row);
             }
         }
-
         return jobs;
     }
-
     /**
      * Search all columns for the given term
      *
@@ -93,11 +81,20 @@ public class JobData {
 
         // load data, if not already loaded
         loadData();
-
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+        for (HashMap<String, String> job : allJobs) {
+            for (String field : job.values()) {
+                //Searches all jobs fields and stops search after match.
+                //eRrYbOdY tAlKiN lIkE tHiS
+                if (field.toLowerCase().contains(value.toLowerCase())) {
+                    jobs.add(job);
+                    break;
+                }
+            }
+        }
+        return jobs;
         // TODO - implement this method
-        return null;
     }
-
     /**
      * Read in data from a CSV file and store it in a list
      */
@@ -107,9 +104,7 @@ public class JobData {
         if (isDataLoaded) {
             return;
         }
-
         try {
-
             // Open the CSV file and set up pull out column header info and records
             Reader in = new FileReader(DATA_FILE);
             CSVParser parser = CSVFormat.RFC4180.withFirstRecordAsHeader().parse(in);
@@ -118,7 +113,6 @@ public class JobData {
             String[] headers = parser.getHeaderMap().keySet().toArray(new String[numberOfColumns]);
 
             allJobs = new ArrayList<>();
-
             // Put the records into a more friendly format
             for (CSVRecord record : records) {
                 HashMap<String, String> newJob = new HashMap<>();
@@ -126,17 +120,13 @@ public class JobData {
                 for (String headerLabel : headers) {
                     newJob.put(headerLabel, record.get(headerLabel));
                 }
-
                 allJobs.add(newJob);
             }
-
             // flag the data as loaded, so we don't do it twice
             isDataLoaded = true;
-
         } catch (IOException e) {
             System.out.println("Failed to load job data");
             e.printStackTrace();
         }
     }
-
 }
